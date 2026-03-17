@@ -51,11 +51,15 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       </head>
       <body className={clsx('min-h-screen bg-background font-sans antialiased', fontSans.variable)}>
         <Providers attribute="class" defaultTheme="dark">
-          <div className="relative flex flex-col h-screen">
+          <div className="relative flex flex-col h-screen bg-gradient-to-br from-background to-default-50">
             <Navbar />
             <div className="flex flex-1">
               <Aside />
-              <main className="w-[calc(100%-4rem)] px-6 py-12">
+              <main className="w-[calc(100%-4rem)] px-6 py-12 relative overflow-hidden">
+                {/* Decorative background blur element */}
+                <div className="absolute top-0 right-0 -m-32 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute bottom-0 left-0 -m-32 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
+                
                 {children}
                 <Toaster closeButton richColors visibleToasts={3} />
               </main>

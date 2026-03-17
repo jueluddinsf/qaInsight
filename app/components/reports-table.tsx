@@ -232,8 +232,8 @@ export default function ReportsTable({ onChange, selected, onSelect, onDeleted }
           ) : null
         }
         classNames={{
-          wrapper: 'p-0 border-none shadow-none',
-          tr: 'border-b-1 rounded-0',
+          wrapper: 'p-4 border-1 border-gray-200 dark:border-gray-800 shadow-sm rounded-xl bg-white/50 dark:bg-black/50 backdrop-blur-md',
+          tr: 'border-b-1 border-gray-100 dark:border-gray-800 transition-all hover:bg-default-100/50 hover:scale-[1.01]',
         }}
         radius="none"
         selectedKeys={selected}
@@ -274,12 +274,11 @@ export default function ReportsTable({ onChange, selected, onSelect, onDeleted }
                       return (
                         <Chip
                           key={`${key}-${index}`}
-                          className="text-xs h-5"
-                          color="default"
+                          className="text-xs h-6 border border-primary/20 bg-primary/10 text-primary dark:text-primary-400"
                           size="sm"
                           startContent={icon}
                           title={`${key}: ${formattedValue}`}
-                          variant="flat"
+                          variant="faded"
                         >
                           <span className="max-w-[150px] truncate">{displayValue}</span>
                         </Chip>

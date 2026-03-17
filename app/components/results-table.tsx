@@ -186,8 +186,8 @@ export default function ResultsTable({ onSelect, onDeleted, selected }: Readonly
           ) : null
         }
         classNames={{
-          wrapper: 'p-0 border-none shadow-none',
-          tr: 'border-b-1 rounded-0',
+          wrapper: 'p-4 border-1 border-gray-200 dark:border-gray-800 shadow-sm rounded-xl bg-white/50 dark:bg-black/50 backdrop-blur-md',
+          tr: 'border-b-1 border-gray-100 dark:border-gray-800 transition-all hover:bg-default-100/50 hover:scale-[1.01]',
         }}
         radius="none"
         selectedKeys={selected}
@@ -222,8 +222,9 @@ export default function ResultsTable({ onSelect, onDeleted, selected }: Readonly
                 {getTags(item).map(([key, value], index) => (
                   <Chip
                     key={`${key}-${index}`}
-                    className="m-1 p-3 text-nowrap bg-[#DAE7F8] dark:bg-[#1E3A8A]"
+                    className="m-1 p-3 text-nowrap border border-primary/20 bg-primary/10 text-primary dark:text-primary-400"
                     size="sm"
+                    variant="faded"
                   >{`${key}: ${value}`}</Chip>
                 ))}
               </TableCell>

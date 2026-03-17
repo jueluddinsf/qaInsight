@@ -4,18 +4,19 @@
 
 @layer base {
     :root {
-        --chart-1: 160 60% 45%;
-        --chart-2: 350 70% 56%;
-        --chart-3: 0 8% 65%;
-        --chart-4: 37 91% 55%;
-        --chart-5: 340 75% 55%;
+        /* Voya Vivid Semantic Colors */
+        --chart-1: 142 71% 45%;   /* Passed: Vibrant Green */
+        --chart-2: 348 83% 47%;   /* Failed: Vivid Red */
+        --chart-3: 0 0% 65%;      /* Skipped: Neutral Gray */
+        --chart-4: 35 92% 53%;    /* Flaky: Voya Orange/Yellow */
+        --chart-5: 270 50% 60%;
     }
   
     .dark {
-        --chart-1: 160 60% 45%;
-        --chart-2: 350 70% 56%;
-        --chart-3: 0 8% 65%;
-        --chart-4: 37 91% 55%;
-        --chart-5: 340 75% 55%;
+        --chart-1: 142 71% 45%;
+        --chart-2: 348 83% 47%;
+        --chart-3: 0 0% 50%;
+        --chart-4: 35 92% 53%;
+        --chart-5: 270 50% 60%;
     }
   }
