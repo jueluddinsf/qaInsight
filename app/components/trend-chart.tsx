@@ -1,5 +1,5 @@
 'use client';
-import { Area, AreaChart, XAxis } from 'recharts';
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts';
 import Link from 'next/link';
 import { Alert } from '@heroui/react';
 
@@ -62,9 +62,9 @@ export function TrendChart({ reportHistory }: Readonly<TrendChartProps>) {
   }));
 
   return (
-    <ChartContainer config={chartConfig}>
+    <ChartContainer className="w-full h-full min-h-[300px]" config={chartConfig}>
       {reportHistory.length <= 1 ? (
-        <div className="flex items-center justify-center w-auto">
+        <div className="flex items-center justify-center w-full h-full">
           <div key="warning" className="flex items-center my-3 mt-10">
             <Alert color="warning" title={`Not enough data for trend chart`} />
           </div>
@@ -74,9 +74,10 @@ export function TrendChart({ reportHistory }: Readonly<TrendChartProps>) {
           accessibilityLayer
           data={chartData.reverse()}
           margin={{
-            left: 12,
+            left: -20,
             right: 12,
-            top: 12,
+            top: 24,
+            bottom: 0,
           }}
           onClick={(e) => {
             const url = e.activePayload?.at(0)?.payload?.reportUrl;
@@ -84,16 +85,23 @@ export function TrendChart({ reportHistory }: Readonly<TrendChartProps>) {
             url && openInNewTab(url);
           }}
         >
+          <CartesianGrid className="stroke-default-200" strokeDasharray="3 3" vertical={false} />
           <XAxis
             axisLine={false}
             dataKey="date"
             tickFormatter={(value: number) => {
               return new Date(value).toLocaleDateString(undefined, {
-                year: 'numeric',
                 month: 'short',
                 day: 'numeric',
               });
             }}
+            tickLine={false}
+            tickMargin={10}
+          />
+          <YAxis
+            axisLine={false}
+            domain={[0, 100]}
+            tickFormatter={(value: number) => `${value}%`}
             tickLine={false}
             tickMargin={10}
           />
@@ -130,16 +138,21 @@ export function TrendChart({ reportHistory }: Readonly<TrendChartProps>) {
                           Total
                           <div className="ml-auto flex items-baseline gap-0.5 font-mono font-medium tabular-nums text-foreground">
                             {(item.payload as WithTotal).total}
-                            <span className="font-normal text-muted-foreground">tests</span>
+                            <span className="font-normal text-muted-foreground ml-1">tests</span>
                           </div>
                         </div>
                         <div className="mt-1.5 flex basis-full items-center border-t pt-1.5 text-xs font-medium text-foreground">
-                          Created At
+                          Date
                           <div className="ml-auto flex items-baseline gap-0.5 font-mono font-medium tabular-nums text-foreground">
                             {new Date(
                               // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
                               item.payload.date,
-                            ).toLocaleString()}
+                            ).toLocaleString(undefined, {
+                              month: 'short',
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })}
                           </div>
                         </div>
                       </>
@@ -152,7 +165,7 @@ export function TrendChart({ reportHistory }: Readonly<TrendChartProps>) {
           />
           <defs>
             {Object.keys(chartConfig).map((key) => (
-              <linearGradient key={`color-${key}`} id={`fill-${key}`} x1="0" y1="0" x2="0" y2="1">
+              <linearGradient key={`color-${key}`} id={`fill-${key}`} x1="0" x2="0" y1="0" y2="1">
                 <stop offset="5%" stopColor={`var(--color-${key})`} stopOpacity={0.8} />
                 <stop offset="95%" stopColor={`var(--color-${key})`} stopOpacity={0.1} />
               </linearGradient>

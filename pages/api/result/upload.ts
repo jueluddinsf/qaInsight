@@ -185,7 +185,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       );
 
       if (error) {
-        return Response.json({ error: `failed to generate report: ${error.message}` }, { status: 500 });
+        return res.status(500).json({ error: `failed to generate report: ${error.message}` });
       }
 
       generatedReport = result;

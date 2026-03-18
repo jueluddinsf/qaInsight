@@ -87,7 +87,7 @@ export const isReportHistory = (report: Report | ReportHistory | undefined): rep
 export type TestHistory = Report & ReportTest;
 
 export type ReportMetadata = Partial<{ title: string; project: string; playwrightVersion?: string }> &
-  Record<string, string>;
+  Record<string, any>;
 
 export interface ServerDataInfo {
   dataFolderSizeinMB: string;

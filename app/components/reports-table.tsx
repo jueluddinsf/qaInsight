@@ -30,14 +30,22 @@ import DeleteReportButton from '@/app/components/delete-report-button';
 import FormattedDate from '@/app/components/date-format';
 import { BranchIcon, FolderIcon } from '@/app/components/icons';
 import { ReadReportsHistory, ReportHistory } from '@/app/lib/storage';
+import ReportDashboardOverview from '@/app/components/report-dashboard-overview';
+import ReportSummaryBar from '@/app/components/report-summary-bar';
 
-const columns = [
-  { name: 'Title', uid: 'title' },
-  { name: 'Project', uid: 'project' },
-  { name: 'Created at', uid: 'createdAt' },
-  { name: 'Size', uid: 'size' },
-  { name: '', uid: 'actions' },
-];
+const columns = [{ name: 'Reports', uid: 'card' }];
+
+const formatDurationMs = (ms?: number) => {
+  if (!ms) return '0s';
+  const seconds = Math.floor((ms / 1000) % 60);
+  const minutes = Math.floor((ms / (1000 * 60)) % 60);
+  const hours = Math.floor((ms / (1000 * 60 * 60)) % 24);
+
+  if (hours > 0) return `${hours}h ${minutes}m ${seconds}s`;
+  if (minutes > 0) return `${minutes}m ${seconds}s`;
+
+  return `${seconds}s`;
+};
 
 const coreFields = [
   'reportID',
@@ -200,6 +208,7 @@ export default function ReportsTable({ onChange, selected, onSelect, onDeleted }
 
   return (
     <>
+      <ReportDashboardOverview reports={reports ?? []} />
       <TablePaginationOptions
         dateFrom={dateFrom}
         dateTo={dateTo}
@@ -215,6 +224,7 @@ export default function ReportsTable({ onChange, selected, onSelect, onDeleted }
         onSearchChange={onSearchChange}
       />
       <Table
+        hideHeader
         aria-label="Reports"
         bottomContent={
           pages > 1 ? (
@@ -232,8 +242,9 @@ export default function ReportsTable({ onChange, selected, onSelect, onDeleted }
           ) : null
         }
         classNames={{
-          wrapper: 'p-4 border-1 border-gray-200 dark:border-gray-800 shadow-sm rounded-xl bg-white/50 dark:bg-black/50 backdrop-blur-md',
-          tr: 'border-b-1 border-gray-100 dark:border-gray-800 transition-all hover:bg-default-100/50 hover:scale-[1.01]',
+          wrapper:
+            'p-4 border-1 border-gray-200 dark:border-gray-800 shadow-sm rounded-xl bg-white/50 dark:bg-black/50 backdrop-blur-md',
+          tr: 'border-b-1 border-gray-100 dark:border-gray-800 transition-all hover:bg-default-100/10 hover:shadow-sm hover:scale-[1.01]',
         }}
         radius="none"
         selectedKeys={selected}
@@ -241,11 +252,7 @@ export default function ReportsTable({ onChange, selected, onSelect, onDeleted }
         onSelectionChange={onChangeSelect}
       >
         <TableHeader columns={columns}>
-          {(column) => (
-            <TableColumn key={column.uid} className="px-3 py-6 text-md text-black dark:text-white font-medium">
-              {column.name}
-            </TableColumn>
-          )}
+          {(column) => <TableColumn key={column.uid}>{column.name}</TableColumn>}
         </TableHeader>
         <TableBody
           emptyContent="No reports."
@@ -255,51 +262,71 @@ export default function ReportsTable({ onChange, selected, onSelect, onDeleted }
         >
           {(item) => (
             <TableRow key={item.reportID}>
-              <TableCell className="w-1/2">
-                <div className="flex flex-col">
-                  {/* Main title and link */}
-                  <Link href={withBase(`/report/${item.reportID}`)} prefetch={false}>
-                    <div className="flex flex-row items-center">
-                      {item.title || item.reportID} <LinkIcon />
+              <TableCell className="w-full">
+                <div className="flex flex-col lg:flex-row items-start lg:items-center w-full py-1">
+                  {/* Left: Title & basic info */}
+                  <div className="flex flex-col gap-0 flex-1 min-w-[200px]">
+                    <Link href={withBase(`/report/${item.reportID}`)} prefetch={false}>
+                      <div className="flex flex-row items-center font-bold text-[13.5px] hover:underline cursor-pointer group text-black dark:text-white truncate pb-0.5">
+                        {item.title || item.reportID}{' '}
+                        <span className="ml-1.5 opacity-50 group-hover:opacity-100 scale-75">
+                          <LinkIcon />
+                        </span>
+                      </div>
+                    </Link>
+                    <div className="text-[10px] text-default-500 flex items-center gap-1.5">
+                      <span className="font-semibold text-primary">{item.project}</span>
+                      <span className="opacity-50">•</span>
+                      <span>{item.files?.length || 0} spec files</span>
+                      <span className="opacity-50">•</span>
+                      <span>{item.duration ? formatDurationMs(item.duration) : '0s'}</span>
+                      {/* Tags array */}
+                      <div className="hidden lg:flex flex-wrap gap-1 ml-2">
+                        {getMetadataItems(item)
+                          .slice(0, 3)
+                          .map(({ key, value }, index) => {
+                            return (
+                              <Chip
+                                key={`${key}-${index}`}
+                                className="h-4 text-[8px] px-1 border-none bg-default-100 text-default-600"
+                                size="sm"
+                                variant="flat"
+                              >
+                                <span className="max-w-[70px] truncate">
+                                  {key}: {formatMetadataValue(value)}
+                                </span>
+                              </Chip>
+                            );
+                          })}
+                      </div>
                     </div>
-                  </Link>
-
-                  {/* Metadata chips below title */}
-                  <div className="flex flex-wrap gap-1 mt-1">
-                    {getMetadataItems(item).map(({ key, value, icon }, index) => {
-                      const formattedValue = formatMetadataValue(value);
-                      const displayValue =
-                        key === 'branch' || key === 'workingDir' ? formattedValue : `${key}: ${formattedValue}`;
-
-                      return (
-                        <Chip
-                          key={`${key}-${index}`}
-                          className="text-xs h-6 border border-primary/20 bg-primary/10 text-primary dark:text-primary-400"
-                          size="sm"
-                          startContent={icon}
-                          title={`${key}: ${formattedValue}`}
-                          variant="faded"
-                        >
-                          <span className="max-w-[150px] truncate">{displayValue}</span>
-                        </Chip>
-                      );
-                    })}
                   </div>
-                </div>
-              </TableCell>
-              <TableCell className="w-1/4">{item.project}</TableCell>
-              <TableCell className="w-1/4">
-                <FormattedDate date={item.createdAt} />
-              </TableCell>
-              <TableCell className="w-1/4">{item.size}</TableCell>
-              <TableCell className="w-1/4">
-                <div className="flex gap-4 justify-end">
-                  <Link href={withBase(item.reportUrl)} prefetch={false} target="_blank">
-                    <Button color="primary" size="md">
-                      Open report
-                    </Button>
-                  </Link>
-                  <DeleteReportButton reportId={item.reportID} onDeleted={handleDeleted} />
+
+                  {/* Middle: Stats */}
+                  <div className="w-full lg:w-[260px] shrink-0 mt-1 lg:mt-0 mx-0 lg:mx-4">
+                    <ReportSummaryBar stats={item.stats} />
+                  </div>
+
+                  {/* Right: Actions */}
+                  <div className="flex items-center gap-2 shrink-0 ml-auto mt-1 lg:mt-0">
+                    <div className="hidden xl:flex flex-col items-end mr-1 leading-[1.2]">
+                      <span className="text-[10px] text-default-500 whitespace-nowrap">
+                        <FormattedDate date={item.createdAt} />
+                      </span>
+                      <span className="text-[9px] text-default-400">{item.size}</span>
+                    </div>
+                    <Link href={withBase(`/report/${item.reportID}`)} prefetch={false}>
+                      <Button className="h-6 min-h-0 text-[10px] px-2 min-w-0" size="sm" variant="flat">
+                        JSON
+                      </Button>
+                    </Link>
+                    <Link href={withBase(item.reportUrl)} prefetch={false} target="_blank">
+                      <Button className="h-6 min-h-0 text-[10px] px-2 min-w-0" color="primary" size="sm" variant="flat">
+                        HTML
+                      </Button>
+                    </Link>
+                    <DeleteReportButton reportId={item.reportID} onDeleted={handleDeleted} />
+                  </div>
                 </div>
               </TableCell>
             </TableRow>

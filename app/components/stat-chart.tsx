@@ -56,7 +56,7 @@ export function StatChart({ stats }: Readonly<StatChartProps>) {
   ];
 
   return (
-    <ChartContainer className="mx-auto aspect-square max-h-[250px]" config={chartConfig}>
+    <ChartContainer className="mx-auto aspect-square w-full min-h-[250px] max-h-[300px]" config={chartConfig}>
       <PieChart>
         <ChartTooltip content={<ChartTooltipContent hideLabel />} cursor={false} />
         <Pie data={chartData} dataKey="count" innerRadius={60} nameKey="status" strokeWidth={5}>

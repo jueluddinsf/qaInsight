@@ -85,20 +85,14 @@ export async function readResults(input?: ReadResultsInput) {
   await createDirectoriesIfMissing();
   const files = await fs.readdir(RESULTS_FOLDER);
 
-  const stats = await processBatch<string, Stats & { filePath: string; size: string; sizeBytes: number }>(
+  const stats = await processBatch<string, Stats & { filePath: string }>(
     {},
     files.filter((file) => file.endsWith('.json')),
-    20,
+    50,
     async (file) => {
       const filePath = path.join(RESULTS_FOLDER, file);
-
       const stat = await fs.stat(filePath);
-
-      const sizeBytes = await getFolderSize.loose(filePath.replace('.json', '.zip'));
-
-      const size = bytesToString(sizeBytes);
-
-      return Object.assign(stat, { filePath, size, sizeBytes });
+      return Object.assign(stat, { filePath });
     },
   );
 
@@ -107,12 +101,17 @@ export async function readResults(input?: ReadResultsInput) {
   const fileContents: Result[] = await Promise.all(
     jsonFiles.map(async (entry) => {
       const content = await fs.readFile(entry.filePath, 'utf-8');
-
-      return {
-        size: entry.size,
-        sizeBytes: entry.sizeBytes,
-        ...JSON.parse(content),
-      };
+      const parsed = JSON.parse(content);
+      
+      if (parsed.sizeBytes === undefined) {
+         try {
+           const sizeBytes = await getFolderSize.loose(entry.filePath.replace('.json', '.zip'));
+           parsed.sizeBytes = sizeBytes;
+           parsed.size = bytesToString(sizeBytes);
+         } catch(e) {}
+      }
+      
+      return parsed;
     }),
   );
 
@@ -184,32 +183,42 @@ function isMissingFileError(error?: Error | null) {
 }
 
 async function readOrParseReportMetadata(id: string, projectName: string): Promise<ReportMetadata> {
+  const targetDir = path.join(REPORTS_FOLDER, projectName, id);
+  const metaPath = path.join(projectName, id, REPORT_METADATA_FILE);
   const { result: metadataContent, error: metadataError } = await withError(
-    readFile(path.join(projectName, id, REPORT_METADATA_FILE), 'utf-8'),
+    readFile(metaPath, 'utf-8'),
   );
 
-  if (metadataError) console.error(`failed to read metadata for ${id}: ${metadataError.message}`);
+  if (metadataError && !isMissingFileError(metadataError)) console.error(`failed to read metadata for ${id}: ${metadataError.message}`);
 
   const metadata = metadataContent && !metadataError ? JSON.parse(metadataContent.toString()) : {};
 
-  if (!isMissingFileError(metadataError)) {
+  if (!isMissingFileError(metadataError) && metadata.sizeBytes !== undefined) {
     return metadata;
   }
 
-  console.log(`metadata file not found for ${id}, creating new metadata`);
   try {
-    const parsed = await parseReportMetadata(id, path.join(REPORTS_FOLDER, projectName, id), {
-      project: projectName,
-      reportID: id,
-    });
+    let parsed = metadata;
+    if (isMissingFileError(metadataError)) {
+      parsed = await parseReportMetadata(id, targetDir, {
+        project: projectName,
+        reportID: id,
+      });
+      console.log(`parsed brand new metadata for ${id}`);
+    }
 
-    console.log(`parsed metadata for ${id}`);
+    if (parsed.sizeBytes === undefined) {
+      const sizeBytes = await getFolderSize.loose(targetDir);
+      parsed.sizeBytes = sizeBytes;
+      parsed.size = bytesToString(sizeBytes);
+      console.log(`Hydrated legacy folder size for report: ${id}`);
+    }
 
-    await saveReportMetadata(path.join(REPORTS_FOLDER, projectName, id), parsed);
+    await saveReportMetadata(targetDir, parsed);
 
     Object.assign(metadata, parsed);
   } catch (e) {
-    console.error(`failed to create metadata for ${id}: ${(e as Error).message}`);
+    console.error(`failed to create/hydrate metadata for ${id}: ${(e as Error).message}`);
   }
 
   return metadata;
@@ -217,21 +226,45 @@ async function readOrParseReportMetadata(id: string, projectName: string): Promi
 
 export async function readReports(input?: ReadReportsInput): Promise<ReadReportsOutput> {
   await createDirectoriesIfMissing();
-  const entries = await fs.readdir(REPORTS_FOLDER, { withFileTypes: true, recursive: true });
+  
+  const reportDirs: string[] = [];
+  const level1 = await fs.readdir(REPORTS_FOLDER, { withFileTypes: true }).catch(() => []);
+  
+  // Non-recursive, 2-level deep traversal. Drastically faster than recursive on trace dirs.
+  await Promise.all(level1.map(async (entry) => {
+    if (!entry.isDirectory()) return;
+    const entryPath = path.join(REPORTS_FOLDER, entry.name);
+    
+    const isReport = await fs.access(path.join(entryPath, 'index.html')).then(() => true).catch(() => false);
+    if (isReport) {
+      reportDirs.push(entryPath);
+      return;
+    }
+    
+    const level2 = await fs.readdir(entryPath, { withFileTypes: true }).catch(() => []);
+    await Promise.all(level2.map(async (sub) => {
+      if (!sub.isDirectory()) return;
+      const subPath = path.join(entryPath, sub.name);
+      const isSubReport = await fs.access(path.join(subPath, 'index.html')).then(() => true).catch(() => false);
+      if (isSubReport) reportDirs.push(subPath);
+    }));
+  }));
 
-  const reportEntries = entries
-    .filter((entry) => !entry.isDirectory() && entry.name === 'index.html' && !(entry as any).path.endsWith('trace'))
-    .filter((entry) => (input?.ids ? input.ids.some((id) => (entry as any).path.includes(id)) : entry))
-    .filter((entry) => (input?.project ? (entry as any).path.includes(input.project) : entry));
+  let filteredDirs = reportDirs;
+  if (input?.ids && input.ids.length > 0) {
+    filteredDirs = filteredDirs.filter((dir) => input.ids!.some((id) => dir.includes(id)));
+  }
+  if (input?.project) {
+    filteredDirs = filteredDirs.filter((dir) => dir.includes(input.project!));
+  }
 
-  const stats = await processBatch<Dirent, Stats & { filePath: string; createdAt: Date }>(
+  const stats = await processBatch<string, Stats & { filePath: string; createdAt: Date }>(
     {},
-    reportEntries,
-    20,
-    async (file) => {
-      const stat = await fs.stat((file as any).path);
-
-      return Object.assign(stat, { filePath: (file as any).path, createdAt: stat.birthtime });
+    filteredDirs,
+    50,
+    async (dirPath) => {
+      const stat = await fs.stat(path.join(dirPath, 'index.html'));
+      return Object.assign(stat, { filePath: dirPath, createdAt: stat.birthtime });
     },
   );
 
@@ -248,15 +281,13 @@ export async function readReports(input?: ReadReportsInput): Promise<ReadReports
     })
     .filter((report) => (input?.project ? input.project === report.project : report));
 
-  const allReports = await Promise.all(
-    reportsWithProject.map(async (file) => {
-      const id = path.basename(file.filePath);
-      const reportPath = path.dirname(file.filePath);
-      const parentDir = path.basename(reportPath);
-      const sizeBytes = await getFolderSize.loose(path.join(reportPath, id));
-      const size = bytesToString(sizeBytes);
-
-      const projectName = parentDir === REPORTS_PATH ? '' : parentDir;
+  const allReports = await processBatch<typeof reportsWithProject[0], any>(
+    {},
+    reportsWithProject,
+    10, // Max 10 concurrent hydrations to prevent locking up the node disk thread pool
+    async (file) => {
+      const id = file.id;
+      const projectName = file.project;
 
       const metadata = await readOrParseReportMetadata(id, projectName);
 
@@ -264,12 +295,10 @@ export async function readReports(input?: ReadReportsInput): Promise<ReadReports
         reportID: id,
         project: projectName,
         createdAt: file.birthtime,
-        size,
-        sizeBytes,
         reportUrl: `${serveReportRoute}/${projectName ? encodeURIComponent(projectName) : ''}/${id}/index.html`,
         ...metadata,
       };
-    }),
+    }
   );
 
   let filteredReports = allReports as ReportHistory[];
@@ -402,6 +431,10 @@ export async function generateReport(resultsIds: string[], metadata?: ReportMeta
     }
     const generated = await generatePlaywrightReport(reportId, metadata!);
     const info = await parseReportMetadata(reportId, generated.reportPath, metadata);
+
+    const sizeBytes = await getFolderSize.loose(generated.reportPath);
+    info.sizeBytes = sizeBytes;
+    info.size = bytesToString(sizeBytes);
 
     await saveReportMetadata(generated.reportPath, info);
 

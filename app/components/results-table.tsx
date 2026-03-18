@@ -186,7 +186,8 @@ export default function ResultsTable({ onSelect, onDeleted, selected }: Readonly
           ) : null
         }
         classNames={{
-          wrapper: 'p-4 border-1 border-gray-200 dark:border-gray-800 shadow-sm rounded-xl bg-white/50 dark:bg-black/50 backdrop-blur-md',
+          wrapper:
+            'p-4 border-1 border-gray-200 dark:border-gray-800 shadow-sm rounded-xl bg-white/50 dark:bg-black/50 backdrop-blur-md',
           tr: 'border-b-1 border-gray-100 dark:border-gray-800 transition-all hover:bg-default-100/50 hover:scale-[1.01]',
         }}
         radius="none"
