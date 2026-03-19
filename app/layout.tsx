@@ -49,7 +49,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         />
       </head>
       <body className={clsx('min-h-screen bg-background font-sans antialiased', fontSans.variable)}>
-        <Providers attribute="class" defaultTheme="dark">
+        <Providers attribute="class" defaultTheme="dark" enableSystem={false}>
           <div className="relative flex flex-col h-screen bg-gradient-to-br from-background to-default-50">
             <Navbar />
             <div className="flex flex-1">
