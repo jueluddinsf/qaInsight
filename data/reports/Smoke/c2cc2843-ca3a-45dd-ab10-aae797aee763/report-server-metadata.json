@@ -1,0 +1,64 @@
+{
+  "metadata": {
+    "actualWorkers": 1
+  },
+  "startTime": 1755353160559,
+  "duration": 412150.0620000004,
+  "files": [
+    {
+      "fileId": "d087e2ce8f3c51adc9a2",
+      "fileName": "manua.spec.ts",
+      "tests": [
+        {
+          "testId": "d087e2ce8f3c51adc9a2-d2eaaee99e47d82dd601",
+          "title": "example with manual step",
+          "projectName": "chromium",
+          "location": {
+            "file": "manua.spec.ts",
+            "line": 2,
+            "column": 5
+          },
+          "duration": 410927,
+          "annotations": [],
+          "tags": [],
+          "outcome": "expected",
+          "path": [],
+          "ok": true,
+          "results": [
+            {
+              "attachments": []
+            }
+          ]
+        }
+      ],
+      "stats": {
+        "total": 1,
+        "expected": 1,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "ok": true
+      }
+    }
+  ],
+  "projectNames": [
+    "chromium"
+  ],
+  "stats": {
+    "total": 1,
+    "expected": 1,
+    "unexpected": 0,
+    "flaky": 0,
+    "skipped": 0,
+    "ok": true
+  },
+  "errors": [],
+  "options": {},
+  "reportID": "c2cc2843-ca3a-45dd-ab10-aae797aee763",
+  "createdAt": "2026-03-18T19:01:53.792Z",
+  "project": "Smoke",
+  "playwrightVersion": "",
+  "title": "Smoke Test",
+  "sizeBytes": 517984,
+  "size": "505.84 KB"
+}

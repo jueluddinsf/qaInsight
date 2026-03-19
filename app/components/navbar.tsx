@@ -57,6 +57,7 @@ export const Navbar: React.FC = () => {
                 />
               )}
             </Skeleton>
+            <span className="ml-2 font-bold text-xl tracking-tight text-primary">Voya QA Insights</span>
           </NextLink>
 
           {isCustomTitle && <h1 className={subtitle()}>{config?.title}</h1>}

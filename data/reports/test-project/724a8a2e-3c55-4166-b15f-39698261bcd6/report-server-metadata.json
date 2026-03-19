@@ -1,0 +1,86 @@
+{
+  "metadata": {
+    "actualWorkers": 2
+  },
+  "startTime": 1755353160559,
+  "duration": 412150.0620000004,
+  "files": [
+    {
+      "fileId": "d087e2ce8f3c51adc9a2",
+      "fileName": "manua.spec.ts",
+      "tests": [
+        {
+          "testId": "d087e2ce8f3c51adc9a2-d2eaaee99e47d82dd601",
+          "title": "example with manual step",
+          "projectName": "chromium",
+          "location": {
+            "file": "manua.spec.ts",
+            "line": 2,
+            "column": 5
+          },
+          "duration": 410927,
+          "annotations": [],
+          "tags": [],
+          "outcome": "expected",
+          "path": [],
+          "ok": true,
+          "results": [
+            {
+              "attachments": []
+            }
+          ]
+        },
+        {
+          "testId": "d087e2ce8f3c51adc9a2-d2eaaee99e47d82dd6011",
+          "title": "example with manual step",
+          "projectName": "chromium",
+          "location": {
+            "file": "manua.spec.ts",
+            "line": 2,
+            "column": 5
+          },
+          "duration": 410927,
+          "annotations": [],
+          "tags": [],
+          "outcome": "expected",
+          "path": [],
+          "ok": true,
+          "results": [
+            {
+              "attachments": []
+            }
+          ]
+        }
+      ],
+      "stats": {
+        "total": 2,
+        "expected": 2,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "ok": true
+      }
+    }
+  ],
+  "projectNames": [
+    "chromium",
+    "chromium"
+  ],
+  "stats": {
+    "total": 2,
+    "expected": 2,
+    "unexpected": 0,
+    "flaky": 0,
+    "skipped": 0,
+    "ok": true
+  },
+  "errors": [],
+  "options": {},
+  "reportID": "724a8a2e-3c55-4166-b15f-39698261bcd6",
+  "createdAt": "2026-03-18T19:01:53.792Z",
+  "project": "test-project",
+  "playwrightVersion": "",
+  "title": "Smoke test",
+  "sizeBytes": 518660,
+  "size": "506.50 KB"
+}

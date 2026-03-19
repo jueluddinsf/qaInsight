@@ -1,0 +1,85 @@
+{
+  "metadata": {
+    "actualWorkers": 2
+  },
+  "startTime": 1755353160559,
+  "duration": 412150.0620000004,
+  "files": [
+    {
+      "fileId": "d087e2ce8f3c51adc9a2",
+      "fileName": "manua.spec.ts",
+      "tests": [
+        {
+          "testId": "d087e2ce8f3c51adc9a2-d2eaaee99e47d82dd601",
+          "title": "example with manual step",
+          "projectName": "chromium",
+          "location": {
+            "file": "manua.spec.ts",
+            "line": 2,
+            "column": 5
+          },
+          "duration": 410927,
+          "annotations": [],
+          "tags": [],
+          "outcome": "expected",
+          "path": [],
+          "ok": true,
+          "results": [
+            {
+              "attachments": []
+            }
+          ]
+        },
+        {
+          "testId": "d087e2ce8f3c51adc9a2-d2eaaee99e47d82dd6011",
+          "title": "example with manual step",
+          "projectName": "chromium",
+          "location": {
+            "file": "manua.spec.ts",
+            "line": 2,
+            "column": 5
+          },
+          "duration": 410927,
+          "annotations": [],
+          "tags": [],
+          "outcome": "expected",
+          "path": [],
+          "ok": true,
+          "results": [
+            {
+              "attachments": []
+            }
+          ]
+        }
+      ],
+      "stats": {
+        "total": 2,
+        "expected": 2,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "ok": true
+      }
+    }
+  ],
+  "projectNames": [
+    "chromium",
+    "chromium"
+  ],
+  "stats": {
+    "total": 2,
+    "expected": 2,
+    "unexpected": 0,
+    "flaky": 0,
+    "skipped": 0,
+    "ok": true
+  },
+  "errors": [],
+  "options": {},
+  "reportID": "c99e0777-14b9-47e8-9f80-ab4fcaa6c92c",
+  "createdAt": "2026-03-18T19:01:53.706Z",
+  "testRun": "36c3aa23-2466-4ef7-afa2-2feeac3efdb2",
+  "playwrightVersion": "",
+  "sizeBytes": 518659,
+  "size": "506.50 KB"
+}

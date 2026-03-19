@@ -1,0 +1,12 @@
+{
+  "resultID": "8506f788-92f4-4223-a2ba-221fecf58762",
+  "createdAt": "2026-03-18T19:05:12.202Z",
+  "project": "regression",
+  "reporter": "qa_engineer",
+  "shardCurrent": "1",
+  "shardTotal": "1",
+  "triggerReportGeneration": "true",
+  "appVersion": "1.0.0",
+  "size": "2.50 KB",
+  "sizeBytes": 2562
+}

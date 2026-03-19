@@ -1,0 +1,13 @@
+{
+  "resultID": "e09c7f98-4a26-4c5e-8a4e-27b314ee6bcf",
+  "createdAt": "2026-03-18T19:06:08.837Z",
+  "project": "smoke",
+  "reporter": "qa_engineer",
+  "shardCurrent": "1",
+  "shardTotal": "1",
+  "triggerReportGeneration": "true",
+  "appVersion": "1.0.0",
+  "testRun": "fresh-smoke-run-1",
+  "size": "2.50 KB",
+  "sizeBytes": 2562
+}

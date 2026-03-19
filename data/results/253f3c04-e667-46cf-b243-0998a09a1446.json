@@ -1,0 +1,13 @@
+{
+  "resultID": "253f3c04-e667-46cf-b243-0998a09a1446",
+  "createdAt": "2026-03-18T19:05:27.119Z",
+  "project": "smoke-tests",
+  "reporter": "ci_bot",
+  "shardCurrent": "1",
+  "shardTotal": "1",
+  "triggerReportGeneration": "true",
+  "appVersion": "1.0.1",
+  "testRun": "smoke-run-1",
+  "size": "2.50 KB",
+  "sizeBytes": 2562
+}
